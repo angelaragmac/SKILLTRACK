@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillTrack | Student Dashboard</title>
+  <link rel="icon" href="../assets/images/brain.jpg">
+  <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/css/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/skilltrack.js"></script>
+<script>
+const user = ST.require('student');
+
+if (user) {
+  const page = renderShell(user, 'dashboard', 'Student Dashboard');
+
+  /* ---------- Small building blocks ---------- */
+  const statCard = (label, value, sub, icon, style) => `
+    <div class="col-sm-6 col-xl-3">
+      <div class="card stat-card h-100">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <div class="stat-caption">${label}</div>
+            <div class="stat-value">${value}</div>
+            <div class="stat-caption">${sub}</div>
+          </div>
+          <span class="stat-icon" style="${style}"><i class="bi ${icon}"></i></span>
+        </div>
+      </div>
+    </div>`;
+
+  const panel = (colClass, header, body) => `
+    <div class="${colClass}">
+      <div class="card dashboard-panel h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">${header}</div>
+        <div class="card-body">${body}</div>
+      </div>
+    </div>`;
+
+  const empty = text => `<p class="text-muted mb-0">${text}</p>`;
+
+  /* ---------- Sections ---------- */
+  const welcomeSection = (assessed) => `
+    <div class="dashboard-welcome d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+      <div>
+        <h1 class="mb-1">Welcome, ${ST.esc(user.name.split(' ')[0])}!</h1>
+        <p class="mb-0">${assessed ? 'Here is your live learning progress.' : 'Take your first quiz so SkillTrack can find your learning gaps.'}</p>
+      </div>
+      <a href="quiz.html" class="btn btn-brand"><i class="bi bi-clipboard-check me-2"></i>${assessed ? 'Take another quiz' : 'Start a quiz'}</a>
+    </div>`;
+
+  const statsSection = ({d, avg, mastered, weak, assessed}) => `
+    <div class="row g-3 mb-4">
+      ${statCard('Quiz average', avg == null ? '—' : pct(avg) + '%', d.attempts.length + ' attempt(s)', 'bi-clipboard-data', 'background:#e6f4f1;color:#0f766e')}
+      ${statCard('Topics assessed', assessed + '/' + ST_TOPICS.length, 'Knowledge traced', 'bi-journal-check', 'background:#e8f7f1;color:#329875')}
+      ${statCard('Mastered topics', mastered, '≥ 80% mastery', 'bi-stars', 'background:#e8f7f1;color:#329875')}
+      ${statCard('Weak topics', weak, '< 60% mastery', 'bi-bullseye', 'background:#fff0e8;color:#d17a4d')}
+    </div>`;
+
+  const recommendedBody = recs => recs.length
+    ? recs.map(r => recItem(r, user.id)).join('')
+    : empty('Recommendations appear once a topic falls below mastery. Take a quiz to begin.');
+
+  const focusBody = (d, weakest) => {
+    if (!weakest) return empty('No data yet. Complete a quiz to see your strengths and focus areas.');
+    const m = d.mastery[weakest.id], isWeak = m < ST.WEAK;
+    return `
+      <span class="strength-chip ${isWeak ? 'needs-chip' : ''}"><i class="bi bi-lightbulb-fill"></i> Focus area</span>
+      <h6 class="fw-bold mt-2 mb-1">${weakest.name}</h6>
+      <p class="small text-muted">Estimated mastery ${pct(m)}%. ${isWeak ? 'Below the 60% threshold, so resources were recommended for you.' : 'Keep practicing to reach 80%.'}</p>
+      <a class="btn btn-sm btn-outline-brand" href="quiz.html?topic=${weakest.id}&mode=practice">Practice this topic</a>`;
+  };
+
+  const masteryBody = d => ST_TOPICS.map(t => {
+    const m = d.mastery[t.id];
+    return `
+      <div class="topic-row">
+        <div class="topic-meta"><span>${t.name}</span><span>${m == null ? 'Not assessed' : pct(m) + '%'}</span></div>
+        <div class="progress"><div class="progress-bar ${m == null ? '' : barClass(m)}" style="width:${m == null ? 0 : pct(m)}%"></div></div>
+      </div>`;
+  }).join('') + `
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <span class="strength-chip"><i class="bi bi-check-circle-fill"></i> Mastered ≥ 80%</span>
+      <span class="strength-chip needs-chip"><i class="bi bi-arrow-repeat"></i> Weak &lt; 60%</span>
+    </div>`;
+
+  const activityBody = d => {
+    const rows = d.attempts.slice(-5).reverse().map(a => {
+      const t = ST_TOPICS.find(x => x.id === a.topic);
+      return `
+        <div class="recommendation-item">
+          <span class="recommendation-icon"><i class="bi bi-check2"></i></span>
+          <div><strong>${t.name} ${a.mode === 'practice' ? 'practice' : 'quiz'}</strong>
+          <small>${a.score}/${a.total} correct · ${new Date(a.at).toLocaleDateString()}</small></div>
+        </div>`;
+    }).join('');
+    return rows || empty('No quiz attempts yet.');
+  };
+
+  /* ---------- Page layout (top to bottom) ----------
+     1. Welcome   2. Stats
+     3. What to do now:  Recommended (left)  +  Focus area (right)
+     4. Your progress:   Topic mastery (left) + Recent activity (right) */
+  const render = () => {
+    const summary = ST.summary(user.id), d = summary.d;
+    const recs = ST.recommend(user.id, 4);
+    const weakest = ST_TOPICS.filter(t => d.mastery[t.id] != null)
+                             .sort((a, b) => d.mastery[a.id] - d.mastery[b.id])[0];
+
+    page.innerHTML = `
+      ${welcomeSection(summary.assessed)}
+      ${statsSection(summary)}
+      <div class="row g-4 mb-4">
+        ${panel('col-xl-7', '<span>Recommended for you</span><a href="resources.html" class="small">See all</a>', recommendedBody(recs))}
+        ${panel('col-xl-5', 'Your learning insights', focusBody(d, weakest))}
+      </div>
+      <div class="row g-4">
+        ${panel('col-xl-7', 'Topic mastery (Knowledge Tracing)', masteryBody(d))}
+        ${panel('col-xl-5', 'Recent activity', activityBody(d))}
+      </div>`;
+
+    wireRecs(page, user.id, render);
+  };
+
+  render();
+}
+</script>
+<script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

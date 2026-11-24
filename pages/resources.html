@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillTrack | My Resources</title>
+  <link rel="icon" href="../assets/images/brain.jpg">
+  <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/css/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/skilltrack.js"></script>
+<script>
+const user = ST.require('student');
+
+if (user) {
+  const page = renderShell(user, 'resources', 'My Resources');
+
+  /* ---------- Small building blocks ---------- */
+  const card = (header, body, extraClass = '') => `
+    <div class="card dashboard-panel ${extraClass}">
+      <div class="card-header">${header}</div>
+      <div class="card-body">${body}</div>
+    </div>`;
+
+  const empty = html => `<p class="text-muted mb-0">${html}</p>`;
+
+  const levelLabel = d => d < .4 ? 'Beginner' : d < .7 ? 'Intermediate' : 'Advanced';
+
+  /* ---------- Section 1: Recommended (personalized) ---------- */
+  const recommendedSection = recs => card(
+    `Recommended (${recs.length})`,
+    recs.length
+      ? recs.map(r => recItem(r, user.id)).join('')
+      : empty('No personalized picks yet. <a href="quiz.html" class="fw-bold">Take a quiz</a> and SkillTrack will recommend resources for your weak topics. You can browse everything below in the meantime.'),
+    'mb-4'
+  );
+
+  /* ---------- Section 2: Completed ---------- */
+  const completedRow = r => `
+    <div class="recommendation-item">
+      <span class="recommendation-icon"><i class="bi ${typeIcon[r.type]}"></i></span>
+      <div>
+        <strong>${ST.esc(r.title)}</strong>
+        <small>${typeLabel[r.type]} · ${ST_TOPICS.find(t => t.id === r.topic).name}</small>
+      </div>
+      <button class="btn btn-sm btn-outline-secondary ms-auto" data-undo="${r.id}">Undo</button>
+    </div>`;
+
+  const completedSection = done => card(
+    `Completed (${done.length})`,
+    done.length ? done.map(completedRow).join('') : empty('Resources you finish will appear here.'),
+    'mb-4'
+  );
+
+  /* ---------- Section 3: Browse all (always visible) ---------- */
+  const libraryRow = (r, d) => `
+    <div class="recommendation-item">
+      <span class="recommendation-icon"><i class="bi ${typeIcon[r.type]}"></i></span>
+      <div>
+        <strong>${ST.esc(r.title)}</strong>
+        <small>${typeLabel[r.type]} · ${levelLabel(r.d)}${d.done[r.id] ? ' · Done' : ''}</small>
+      </div>
+      <div class="ms-auto d-flex gap-1 align-self-center">
+        <a class="btn btn-sm btn-outline-brand" href="${r.url}" ${r.type === 'practice' ? '' : 'target="_blank" rel="noopener"'} data-open="${r.id}">Open</a>
+      </div>
+    </div>`;
+
+  const librarySection = d => card(
+    'Browse all resources',
+    ST_TOPICS.map(t => `
+      <h6 class="fw-bold mt-3"><i class="bi ${t.icon} me-2"></i>${t.name}</h6>
+      ${ST_RESOURCES.filter(r => r.topic === t.id).map(r => libraryRow(r, d)).join('')}`).join('')
+  );
+
+  /* ---------- Page layout (top to bottom) ----------
+     1. Recommended   2. Completed   3. Browse all */
+  const render = () => {
+    const d = ST.dataFor(user.id);
+    const recs = ST.recommend(user.id, 12);
+    const done = Object.keys(d.done)
+                       .map(id => ST_RESOURCES.find(r => r.id === id))
+                       .filter(Boolean);
+
+    page.innerHTML = `
+      <h2 class="fw-bold mb-1">My resources</h2>
+      <p class="text-muted mb-4">Ranked by how much you need the topic and how well the difficulty fits your mastery level.</p>
+      ${recommendedSection(recs)}
+      ${completedSection(done)}
+      ${librarySection(d)}`;
+
+    wireRecs(page, user.id, render);
+    page.querySelectorAll('[data-undo]').forEach(b => b.onclick = () => {
+      ST.markDone(user.id, b.dataset.undo, false);
+      render();
+    });
+  };
+
+  render();
+}
+</script>
+<script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

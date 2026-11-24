@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillTrack | Teacher Dashboard</title>
+  <link rel="icon" href="../assets/images/brain.jpg">
+  <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/css/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/skilltrack.js"></script>
+<script>
+const user = ST.require('teacher');
+
+if (user) {
+  const page = renderShell(user, 'teacher', 'Teacher Dashboard');
+
+  /* ---------- Data ---------- */
+  const students = ST.students();
+
+  // Per-topic class stats: how many assessed, average mastery, how many below 60%
+  const classStats = ST_TOPICS.map(t => {
+    const scores = students.map(s => ST.dataFor(s.id).mastery[t.id]).filter(m => m != null);
+    return {
+      topic: t,
+      assessed: scores.length,
+      avg: scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null,
+      weak: scores.filter(m => m < ST.WEAK).length
+    };
+  });
+
+  /* ---------- Small building blocks ---------- */
+  const panel = (colClass, header, body) => `
+    <div class="${colClass}">
+      <div class="card dashboard-panel h-100">
+        <div class="card-header">${header}</div>
+        <div class="card-body">${body}</div>
+      </div>
+    </div>`;
+
+  const empty = text => `<p class="text-muted mb-0">${text}</p>`;
+
+  /* ---------- Section 1: Average mastery by topic ---------- */
+  const masteryBody = stats => stats.map(c => `
+    <div class="topic-row">
+      <div class="topic-meta">
+        <span>${c.topic.name}</span>
+        <span>${c.avg == null ? 'No data' : pct(c.avg) + '% · ' + c.weak + ' weak'}</span>
+      </div>
+      <div class="progress">
+        <div class="progress-bar ${c.avg == null ? '' : barClass(c.avg)}" style="width:${c.avg == null ? 0 : pct(c.avg)}%"></div>
+      </div>
+    </div>`).join('');
+
+  /* ---------- Section 2: Needs intervention ---------- */
+  const interventionBody = stats => {
+    const rows = stats
+      .filter(c => c.weak)
+      .sort((a, b) => b.weak - a.weak)
+      .map(c => `
+        <div class="recommendation-item">
+          <span class="recommendation-icon"><i class="bi ${c.topic.icon}"></i></span>
+          <div>
+            <strong>${c.topic.name}</strong>
+            <small>${c.weak} of ${c.assessed} assessed student(s) below 60%</small>
+          </div>
+        </div>`).join('');
+    return rows || empty('No weak topics detected yet.');
+  };
+
+  /* ---------- Section 3: Students table ---------- */
+  const studentRow = s => {
+    const x = ST.summary(s.id);
+    const weakTopics = ST_TOPICS.filter(t => x.d.mastery[t.id] < ST.WEAK).map(t => t.name).join(', ');
+    return `
+      <tr>
+        <td>${ST.esc(s.name)}<div class="small text-muted">${ST.esc(s.email)}</div></td>
+        <td>${ST.esc(s.program)} ${ST.esc(s.year)}</td>
+        <td>${x.avg == null ? '—' : pct(x.avg) + '%'}</td>
+        <td>${x.mastered}</td>
+        <td class="small">${weakTopics || '—'}</td>
+      </tr>`;
+  };
+
+  const studentsSection = list => `
+    <div class="card dashboard-panel">
+      <div class="card-header">Students (${list.length})</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table mb-0 align-middle">
+            <thead>
+              <tr><th>Name</th><th>Program</th><th>Quiz avg</th><th>Mastered</th><th>Weak topics</th></tr>
+            </thead>
+            <tbody>
+              ${list.map(studentRow).join('') || '<tr><td colspan="5" class="text-center text-muted py-4">No students registered yet.</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+
+  /* ---------- Page layout (top to bottom) ----------
+     1. Title
+     2. Average mastery (left) + Needs intervention (right)
+     3. Students table */
+  page.innerHTML = `
+    <h2 class="fw-bold mb-1">Class overview</h2>
+    <p class="text-muted mb-4">Class-wide learning gaps from students registered on this device/browser.</p>
+    <div class="row g-4 mb-4">
+      ${panel('col-xl-6', 'Average mastery by topic', masteryBody(classStats))}
+      ${panel('col-xl-6', 'Needs intervention', interventionBody(classStats))}
+    </div>
+    ${studentsSection(students)}`;
+}
+</script>
+<script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

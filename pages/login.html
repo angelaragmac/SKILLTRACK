@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillTrack | Welcome Back</title>
+  <link rel="icon" type="image/png" href="../assets/images/brain.jpg">
+  <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/css/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body class="login-reference-page">
+  <main class="login-reference-shell">
+    <a href="../index.html" class="login-back-link">
+      <i class="bi bi-arrow-left"></i>
+      <span>Back to SkillTrack Home</span>
+    </a>
+
+    <section class="login-reference-card" aria-labelledby="login-title">
+      <a href="../index.html" class="login-reference-brand" aria-label="SkillTrack home">
+        <span class="login-reference-mark"><img src="../assets/images/brain.jpg" alt=""></span>
+        <span class="brand-word">SkillTrack</span>
+      </a>
+
+      <div class="login-reference-heading">
+        <h1 id="login-title">Welcome back</h1>
+        <p>Pick up right where you left off. Enter your details below.</p>
+      </div>
+
+      <div id="formAlert" class="alert alert-danger py-2 small d-none" role="alert"></div>
+      <form id="loginForm" class="login-reference-form" novalidate>
+        <div class="login-field">
+          <label for="email">Email address</label>
+          <div class="login-input-wrap">
+            <i class="bi bi-envelope" aria-hidden="true"></i>
+            <input type="email" id="email" name="email" placeholder="name@example.com" autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="login-field">
+          <div class="login-label-row">
+            <label for="password">Password</label>
+            <a href="#" class="login-inline-link" data-bs-toggle="modal" data-bs-target="#resetModal">Forgot password?</a>
+          </div>
+          <div class="login-input-wrap">
+            <i class="bi bi-lock" aria-hidden="true"></i>
+            <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+            <button type="button" class="login-password-toggle" id="togglePassword" aria-label="Show password">
+              <i class="bi bi-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="login-remember-row">
+          <label class="login-check-label" for="remember">
+            <input type="checkbox" id="remember" name="remember">
+            <span>Keep me signed in</span>
+          </label>
+        </div>
+
+        <button type="submit" class="login-submit-btn">
+          <span>Sign in to Dashboard</span>
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </form>
+
+      <p class="login-signup-prompt">Don't have an account yet? <a href="signup.html">Create an account</a></p>
+      <p class="login-demo-note">Accounts are stored securely in this browser (password hashed).</p>
+    </section>
+  </main>
+
+
+  <div class="modal fade" id="resetModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><form class="modal-content" id="resetForm">
+    <div class="modal-header"><h5 class="modal-title">Reset password</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body"><div id="resetAlert" class="alert py-2 small d-none"></div>
+      <label class="form-label small">Account email</label><input type="email" id="resetEmail" class="form-control mb-3" required>
+      <label class="form-label small">New password (8+ chars, letters &amp; numbers)</label><input type="password" id="resetPw" class="form-control" required></div>
+    <div class="modal-footer"><button class="btn btn-brand w-100">Save new password</button></div></form></div></div>
+  <script src="../assets/js/skilltrack.js"></script>
+  <script src="../assets/js/data.js"></script>
+  <script>
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    togglePassword.addEventListener('click', () => {
+      const showing = passwordInput.type === 'text';
+      passwordInput.type = showing ? 'password' : 'text';
+      togglePassword.innerHTML = showing ? '<i class="bi bi-eye" aria-hidden="true"></i>' : '<i class="bi bi-eye-slash" aria-hidden="true"></i>';
+      togglePassword.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+    });
+
+    const u0 = ST.current(); if (u0) location.href = u0.role === 'teacher' ? 'teacher.html' : 'dashboard.html';
+    const box = document.getElementById('formAlert');
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault(); box.classList.add('d-none');
+      try {
+        const u = await ST.logIn(document.getElementById('email').value, passwordInput.value, document.getElementById('remember').checked);
+        location.href = u.role === 'teacher' ? 'teacher.html' : 'dashboard.html';
+      } catch (err) { box.textContent = err.message; box.classList.remove('d-none'); }
+    });
+    document.getElementById('resetForm').addEventListener('submit', async e => {
+      e.preventDefault(); const a = document.getElementById('resetAlert');
+      try { await ST.resetPassword(document.getElementById('resetEmail').value, document.getElementById('resetPw').value);
+        a.className = 'alert alert-success py-2 small'; a.textContent = 'Password updated. You can now sign in.'; }
+      catch (err) { a.className = 'alert alert-danger py-2 small'; a.textContent = err.message; }
+    });
+  </script>
+  <script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SkillTrack helps students understand their learning progress and discover resources that support improvement.">
+  <title>SkillTrack | Development of an Adaptive Learning Resource Recommendation System Using Knowledge Tracing and Machine Learning.</title>
+  <link rel="icon" type="image/png" href="assets/images/brain.jpg">
+  <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/css/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top site-nav">
+    <div class="container">
+      <a class="navbar-brand brand-lockup" href="index.html">
+        <span class="brand-logo-wrap"><img class="brand-logo-img" src="assets/images/brain.jpg" alt=""></span>
+        <span>Skill<span class="brand-accent">Track</span></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#how-it-works">How it works</a></li>
+          <li class="nav-item"><a class="nav-link" href="#resources">Resources</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item ms-lg-2"><a class="btn btn-outline-brand btn-sm px-3" href="pages/login.html">Log in</a></li>
+          <li class="nav-item"><a class="btn btn-brand btn-sm px-3" href="pages/signup.html">Sign Up <i class="bi bi-arrow-right ms-1"></i></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="container hero-content">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> YOUR PERSONAL LEARNING COMPANION</div>
+          <h1>Make every study session <span class="text-gradient">count.</span></h1>
+          <p class="hero-lead">Understand what you already know, discover what needs more practice, and find learning resources that help you move forward.</p>
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <a href="pages/signup.html" class="btn btn-brand btn-lg">Start learning <i class="bi bi-arrow-up-right ms-2"></i></a>
+            <a href="#how-it-works" class="btn btn-soft btn-lg"><i class="bi bi-play-circle me-2"></i>See how it works</a>
+          </div>
+          <div class="hero-trust mt-4">
+            <div class="avatar-stack"><span> S </span><span> L </span><span> A </span></div>
+            <span>Designed to support smarter study habits</span>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-visual">
+            <div class="hero-photo-wrap"><img src="assets/images/1st Photo.jpeg" alt="Students learning together" class="hero-photo"></div>
+            <div class="floating-card progress-float">
+              <div class="float-icon purple"><i class="bi bi-graph-up-arrow"></i></div>
+              <div><span class="float-label">Learning progress</span><strong>Keep moving forward</strong></div>
+              <span class="float-check"><i class="bi bi-check-lg"></i></span>
+            </div>
+            <div class="floating-card resource-float">
+              <div class="float-icon peach"><i class="bi bi-lightbulb"></i></div>
+              <div><span class="float-label">Next step</span><strong>Find a resource to review</strong></div>
+            </div>
+            <div class="hero-orbit orbit-one"></div>
+            <div class="hero-orbit orbit-two"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-bottom-shape"></div>
+  </header>
+
+  <!-- Features Section -->
+  <section id="features" class="section-space features-section">
+    <div class="container">
+      <div class="section-heading text-center mx-auto">
+        <span class="section-kicker">BUILT AROUND YOUR LEARNING</span>
+        <h2>Tools that help you <span class="text-gradient">improve with purpose.</span></h2>
+        <p>SkillTrack turns learning progress into clear next steps, so you can focus on the topics that matter most.</p>
+      </div>
+      <div class="row g-4 mt-3">
+        <div class="col-md-4">
+          <article class="feature-card h-100">
+            <div class="feature-icon icon-lilac"><i class="bi bi-activity"></i></div>
+            <h3>Track your progress</h3>
+            <p>See your quiz performance and follow your learning journey over time.</p>
+            <span class="feature-number">01</span>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="feature-card h-100">
+            <div class="feature-icon icon-peach"><i class="bi bi-bullseye"></i></div>
+            <h3>Spot topics to improve</h3>
+            <p>Recognize strengths and identify lessons that may need another review.</p>
+            <span class="feature-number">02</span>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="feature-card h-100">
+            <div class="feature-icon icon-mint"><i class="bi bi-journals"></i></div>
+            <h3>Explore helpful resources</h3>
+            <p>Browse suggested videos, reading materials, and practice activities.</p>
+            <span class="feature-number">03</span>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="section-space process-section">
+    <div class="container">
+      <div class="row align-items-end mb-5 g-3">
+        <div class="col-lg-7">
+          <span class="section-kicker">A CLEARER WAY TO STUDY</span>
+          <h2 class="section-title">How SkillTrack works</h2>
+        </div>
+        <div class="col-lg-5">
+          <p class="section-intro mb-0">A simple learning flow that helps you understand your needs and choose what to work on next.</p>
+        </div>
+      </div>
+      <div class="process-line row g-4">
+        <div class="col-md-4">
+          <div class="process-card">
+            <div class="process-step">01</div>
+            <div class="process-icon"><i class="bi bi-clipboard2-check"></i></div>
+            <h3>Take a quiz</h3>
+            <p>Answer a short quiz to check your understanding of a lesson or topic.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="process-card">
+            <div class="process-step">02</div>
+            <div class="process-icon"><i class="bi bi-bar-chart-line"></i></div>
+            <h3>Review your results</h3>
+            <p>Look at your performance to see what you understand and what needs practice.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="process-card">
+            <div class="process-step">03</div>
+            <div class="process-icon"><i class="bi bi-book-half"></i></div>
+            <h3>Choose a resource</h3>
+            <p>Explore learning materials related to the topics you want to strengthen.</p>
+          </div>
+        </div>
+      </div>
+      <div class="note-strip mt-4">
+        <i class="bi bi-info-circle-fill"></i>
+        <span>Learning progress and recommendations shown in this demonstration use sample information.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resources Section -->
+  <section id="resources" class="section-space resources-section">
+    <div class="container">
+      <div class="section-heading text-center mx-auto">
+        <span class="section-kicker">LEARN AT YOUR OWN PACE</span>
+        <h2>Explore learning resources</h2>
+        <p>Different ways to review a topic, practice a skill, and build confidence.</p>
+      </div>
+      <div class="row g-4 mt-3">
+        <div class="col-md-4">
+          <article class="resource-card h-100">
+            <div class="resource-art art-video">
+              <div class="art-circle"><i class="bi bi-play-fill"></i></div>
+              <span class="art-tag">WATCH & LEARN</span>
+            </div>
+            <div class="resource-body">
+              <span class="resource-type">VIDEO LESSON</span>
+              <h3>Learn through visual lessons</h3>
+              <p>Revisit important concepts with guided explanations and examples.</p>
+              <a href="pages/signup.html" class="resource-link">Explore resources <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="resource-card h-100">
+            <div class="resource-art art-reading">
+              <div class="book-shape"><i class="bi bi-journal-text"></i></div>
+              <span class="art-tag">READ & REVIEW</span>
+            </div>
+            <div class="resource-body">
+              <span class="resource-type">READING MATERIAL</span>
+              <h3>Review concepts at your pace</h3>
+              <p>Use notes, summaries, and learning guides to revisit key ideas.</p>
+              <a href="pages/signup.html" class="resource-link">Explore resources <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="resource-card h-100">
+            <div class="resource-art art-practice">
+              <div class="practice-shape"><i class="bi bi-check2-square"></i></div>
+              <span class="art-tag">PRACTICE & GROW</span>
+            </div>
+            <div class="resource-body">
+              <span class="resource-type">PRACTICE EXERCISES</span>
+              <h3>Strengthen what you know</h3>
+              <p>Try practice questions to reinforce topics and check your understanding.</p>
+              <a href="pages/signup.html" class="resource-link">Explore resources <i class="bi bi-arrow-right"></i></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-panel">
+        <div>
+          <span class="section-kicker">YOUR NEXT STEP STARTS HERE</span>
+          <h2>Ready to make learning more focused?</h2>
+          <p>Start exploring your learning progress with SkillTrack.</p>
+        </div>
+        <a href="pages/signup.html" class="btn btn-light btn-lg">Create an account <i class="bi bi-arrow-right ms-2"></i></a>
+        <div class="cta-decoration"><i class="bi bi-stars"></i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="section-space contact-section">
+    <div class="container">
+      <div class="row g-5 align-items-start">
+        <div class="col-lg-5">
+          <span class="section-kicker">WE'RE HERE TO HELP</span>
+          <h2 class="section-title">Get in touch</h2>
+          <p class="section-intro">Have a question or suggestion about SkillTrack? Send us a message.</p>
+          <div class="contact-detail">
+            <span class="contact-icon"><i class="bi bi-envelope"></i></span>
+            <div><strong>Email us</strong><span>hello@skilltrack.example</span></div>
+          </div>
+          <div class="contact-detail">
+            <span class="contact-icon"><i class="bi bi-chat-dots"></i></span>
+            <div><strong>We value your feedback</strong><span>Your suggestions help improve the experience.</span></div>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <form class="contact-form" onsubmit="event.preventDefault(); document.getElementById('contactNotice').classList.remove('d-none');">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="cname" class="form-label">Your name</label>
+                <input type="text" id="cname" class="form-control" placeholder="Enter your name" required>
+              </div>
+              <div class="col-md-6">
+                <label for="cemail" class="form-label">Email address</label>
+                <input type="email" id="cemail" class="form-control" placeholder="name@example.com" required>
+              </div>
+              <div class="col-12">
+                <label for="cmsg" class="form-label">Message</label>
+                <textarea id="cmsg" class="form-control" rows="4" placeholder="How can we help?" required></textarea>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-brand px-4">Send message <i class="bi bi-arrow-right ms-2"></i></button>
+                <div id="contactNotice" class="form-note d-none mt-3">Thanks! This demo form does not send messages to a server.</div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <a class="navbar-brand brand-lockup text-white" href="index.html">
+          <span class="brand-logo-wrap"><img class="brand-logo-img" src="assets/images/brain.jpg" alt=""></span>
+          <span>Skill<span class="brand-accent">Track</span></span>
+        </a>
+        <p class="mb-0">© 2026 SkillTrack. Learning with direction.</p>
+        <div class="footer-links">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

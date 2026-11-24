@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create Account | SkillTrack</title>
+  <link rel="icon" type="image/png" href="../assets/images/brain.jpg">
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../assets/css/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
+</head>
+<body class="auth-page">
+
+    <main class="auth-wrap">
+
+        <!-- Back to Homepage -->
+        <a class="auth-back" href="../index.html">
+            <i class="bi bi-arrow-left"></i>
+            Back to SkillTrack Home
+        </a>
+
+        <!-- Sign Up Card -->
+        <section class="auth-card">
+
+            <a class="auth-brand-lockup" href="../index.html" aria-label="SkillTrack home">
+                <span class="auth-brand-mark"><img src="../assets/images/brain.jpg" alt=""></span>
+                <span>SkillTrack</span>
+            </a>
+
+            <h1>Create your account</h1>
+
+            <p class="auth-sub">
+                Set up your learning space and start tracking your progress.
+            </p>
+
+            <!-- Registration Form -->
+            <div id="formAlert" class="alert alert-danger py-2 small d-none" role="alert"></div>
+            <form id="signupForm" novalidate>
+
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label class="form-label" for="fullname">
+                        Full name
+                    </label>
+
+                    <div class="input-icon">
+                        <i class="bi bi-person"></i>
+
+                        <input
+                            class="form-control"
+                            id="fullname"
+                            type="text"
+                            placeholder="Enter your full name"
+                            required
+                        >
+                    </div>
+                </div>
+
+
+                <div class="mb-3">
+                    <label class="form-label">I am a</label>
+                    <div class="d-flex gap-2">
+                        <input type="radio" class="btn-check" name="role" id="roleStudent" value="student" checked><label class="btn btn-outline-brand flex-fill" for="roleStudent"><i class="bi bi-mortarboard me-1"></i>Student</label>
+                        <input type="radio" class="btn-check" name="role" id="roleTeacher" value="teacher"><label class="btn btn-outline-brand flex-fill" for="roleTeacher"><i class="bi bi-person-workspace me-1"></i>Teacher</label>
+                    </div>
+                </div>
+                <div class="row g-2 mb-3" id="studentFields">
+                    <div class="col-8"><label class="form-label" for="program">Program</label>
+                        <select class="form-select" id="program"><option>BS Information Technology</option><option>BS Computer Science</option><option>BS Computer Engineering</option><option>Other program</option></select></div>
+                    <div class="col-4"><label class="form-label" for="year">Year</label>
+                        <select class="form-select" id="year"><option>1st</option><option>2nd</option><option>3rd</option><option>4th</option></select></div>
+                </div>
+                <!-- Email Address -->
+                <div class="mb-3">
+                    <label class="form-label" for="email">
+                        Email address
+                    </label>
+
+                    <div class="input-icon">
+                        <i class="bi bi-envelope"></i>
+
+                        <input
+                            class="form-control"
+                            id="email"
+                            type="email"
+                            placeholder="name@example.com"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label class="form-label" for="password">
+                        Password
+                    </label>
+
+                    <div class="input-icon">
+                        <i class="bi bi-lock"></i>
+
+                        <input
+                            class="form-control"
+                            id="password"
+                            type="password"
+                            placeholder="8+ characters, letters and numbers"
+                            minlength="8"
+                            required
+                        >
+
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            onclick="togglePassword('password', this)"
+                        >
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="mb-3">
+                    <label class="form-label" for="confirm">
+                        Confirm password
+                    </label>
+
+                    <div class="input-icon">
+                        <i class="bi bi-shield-lock"></i>
+
+                        <input
+                            class="form-control"
+                            id="confirm" autocomplete="new-password"
+                            type="password"
+                            placeholder="Enter your password again"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="form-check mb-3">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="terms"
+                        required
+                    >
+
+                    <label class="form-check-label" for="terms">
+                        I agree to the terms and conditions and the Data Privacy Act-compliant use of my quiz data.
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button
+                    class="btn btn-brand auth-submit"
+                    type="submit"
+                >
+                    Create account
+                    <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+
+            </form>
+
+            <!-- Login Link -->
+            <p class="auth-bottom">
+                Already have an account?
+                <a href="login.html">Log in</a>
+            </p>
+
+        </section>
+
+    </main>
+
+    <!-- Password Visibility Script -->
+    <script>
+        function togglePassword(id, btn) {
+
+            const input = document.getElementById(id);
+            const show = input.type === 'password';
+
+            input.type = show ? 'text' : 'password';
+
+            btn.innerHTML = show
+                ? '<i class="bi bi-eye-slash"></i>'
+                : '<i class="bi bi-eye"></i>';
+        }
+
+        document.querySelectorAll('input[name=role]').forEach(r => r.addEventListener('change', () =>
+            document.getElementById('studentFields').style.display = document.getElementById('roleTeacher').checked ? 'none' : ''));
+    </script>
+    <script src="../assets/js/data.js"></script>
+    <script src="../assets/js/skilltrack.js"></script>
+    <script>
+        if (ST.current()) location.href = ST.current().role === 'teacher' ? 'teacher.html' : 'dashboard.html';
+        const box = document.getElementById('formAlert');
+        document.getElementById('signupForm').addEventListener('submit', async e => {
+            e.preventDefault(); box.classList.add('d-none');
+            const v = id => document.getElementById(id).value;
+            try {
+                if (v('password') !== v('confirm')) throw new Error('Passwords do not match. Please try again.');
+                const role = document.getElementById('roleTeacher').checked ? 'teacher' : 'student';
+                await ST.signUp({name: v('fullname'), email: v('email'), password: v('password'), role, program: v('program'), year: v('year')});
+                await ST.logIn(v('email'), v('password'), true);
+                location.href = role === 'teacher' ? 'teacher.html' : 'dashboard.html';
+            } catch (err) { box.textContent = err.message; box.classList.remove('d-none'); window.scrollTo(0, 0); }
+        });
+    </script>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

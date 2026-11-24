@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillTrack | Quiz</title>
+  <link rel="icon" href="../assets/images/brain.jpg">
+  <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../assets/css/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="../assets/css/style.css" rel="stylesheet">
+  <style>
+    body.quiz-page { min-height: 100vh; background: linear-gradient(160deg, #e7f6f0 0%, #f8fdfc 55%, #e6f4f1 100%); color: var(--ink); }
+
+    /* Top bar + progress */
+    .qz-top { display: flex; align-items: center; gap: 14px; padding: 14px 24px; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+    .qz-top img { width: 34px; height: 34px; border-radius: 9px; }
+    .qz-bar { height: 6px; background: var(--line); }
+    .qz-bar > div { height: 100%; background: var(--brand); transition: width .4s; }
+
+    /* Layout + card */
+    .qz-wrap { max-width: 760px; margin: 0 auto; padding: 36px 18px 60px; }
+    .qz-card { background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 34px; }
+    .qz-q { font-size: 1.45rem; font-weight: 700; line-height: 1.35; margin: 10px 0 24px; }
+
+    /* Answer buttons */
+    .qz-opt { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: var(--soft); border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; font-weight: 600; color: var(--ink); transition: .15s; }
+    .qz-opt:hover:not(:disabled) { border-color: var(--brand); background: #fff; transform: translateY(-1px); }
+    .qz-opt .ltr { width: 32px; height: 32px; border-radius: 9px; background: #fff; border: 1px solid var(--line); display: grid; place-items: center; font-weight: 700; flex: none; }
+    .qz-opt.ok  { background: #e3f6ea; border-color: #2e9d62; }
+    .qz-opt.ok .ltr  { background: #2e9d62; color: #fff; }
+    .qz-opt.bad { background: #fdeceb; border-color: #d9534f; }
+    .qz-opt.bad .ltr { background: #d9534f; color: #fff; }
+
+    /* Results + topic picker */
+    .qz-ring { width: 150px; height: 150px; border-radius: 50%; margin: 10px auto 18px; display: grid; place-items: center; font-size: 2rem; font-weight: 800; }
+    .qz-topic { cursor: pointer; transition: .15s; border: 2px solid transparent; }
+    .qz-topic:hover { border-color: var(--brand); transform: translateY(-3px); }
+  </style>
+</head>
+<body class="quiz-page">
+
+<script src="../assets/js/data.js"></script>
+<script src="../assets/js/skilltrack.js"></script>
+<script>
+const user = ST.require('student');
+
+if (user) {
+  /* ---------- Page frame ---------- */
+  document.body.innerHTML = `
+    <header class="qz-top">
+      <a href="dashboard.html" class="d-flex align-items-center gap-2 text-decoration-none" style="color:var(--ink)">
+        <img src="../assets/images/brain.jpg" alt="">
+        <strong>Skill<span class="brand-accent">Track</span></strong>
+      </a>
+      <span class="fw-bold ms-3 d-none d-sm-inline" id="qzTitle">Quiz</span>
+      <a href="dashboard.html" class="btn btn-outline-brand btn-sm ms-auto" id="exitBtn"><i class="bi bi-x-lg me-1"></i>Exit</a>
+    </header>
+    <div class="qz-bar"><div id="qzProg" style="width:0"></div></div>
+    <main class="qz-wrap" id="page"></main>`;
+
+  const page   = document.getElementById('page');
+  const prog   = document.getElementById('qzProg');
+  const title  = document.getElementById('qzTitle');
+  const params = new URLSearchParams(location.search);
+
+  /* ---------- Screen 1: topic picker ---------- */
+  const topicCard = (t, mastery) => `
+    <div class="col-md-6">
+      <a href="quiz.html?topic=${t.id}" class="text-decoration-none" style="color:inherit">
+        <div class="qz-card qz-topic p-4 h-100">
+          <div class="d-flex align-items-center gap-3">
+            <span class="recommendation-icon"><i class="bi ${t.icon}"></i></span>
+            <div>
+              <strong>${t.name}</strong>
+              <div class="small text-muted">${mastery == null ? '6 questions · not assessed yet' : '6 questions · mastery ' + pct(mastery) + '%'}</div>
+            </div>
+            <i class="bi bi-arrow-right ms-auto"></i>
+          </div>
+        </div>
+      </a>
+    </div>`;
+
+  const showPicker = () => {
+    const d = ST.dataFor(user.id);
+    title.textContent = 'Choose a quiz';
+    page.innerHTML = `
+      <h2 class="fw-bold mb-1">What do you want to be tested on?</h2>
+      <p class="text-muted mb-4">Every answer updates your estimated mastery for the topic.</p>
+      <div class="row g-3">${ST_TOPICS.map(t => topicCard(t, d.mastery[t.id])).join('')}</div>`;
+  };
+
+  /* ---------- Screen 2 + 3: questions and results ---------- */
+  const runQuiz = (tid, mode) => {
+    const topic = ST_TOPICS.find(t => t.id === tid);
+    const startMastery = ST.dataFor(user.id).mastery[tid] ?? .3;
+
+    // Quiz mode: random order. Practice mode: questions closest to your level first.
+    const qs = [...ST_QUESTIONS[tid]].sort(() => Math.random() - .5);
+    if (mode === 'practice') qs.sort((a, b) => Math.abs(a.d - startMastery) - Math.abs(b.d - startMastery));
+
+    let i = 0, score = 0;
+    title.textContent = topic.name + (mode === 'practice' ? ' · Practice' : ' · Quiz');
+
+    document.getElementById('exitBtn').onclick = e => {
+      if (i > 0 && i < qs.length && !confirm('Leave the quiz? Answers already given are saved to your progress.')) e.preventDefault();
+    };
+
+    const showQuestion = () => {
+      const q = qs[i];
+      const order = q.o.map((_, k) => k).sort(() => Math.random() - .5);
+      prog.style.width = (i / qs.length * 100) + '%';
+
+      page.innerHTML = `
+        <div class="qz-card">
+          <div class="d-flex justify-content-between small text-muted fw-bold text-uppercase">
+            <span>Question ${i + 1} of ${qs.length}</span><span>${topic.name}</span>
+          </div>
+          <div class="qz-q">${ST.esc(q.q)}</div>
+          ${order.map((k, n) => `
+            <button class="qz-opt" data-k="${k}"><span class="ltr">${'ABCD'[n]}</span>${ST.esc(q.o[k])}</button>`).join('')}
+          <div id="fb" class="mt-3"></div>
+        </div>`;
+
+      page.querySelectorAll('.qz-opt').forEach(btn => btn.onclick = () => answer(q, btn));
+    };
+
+    const answer = (q, btn) => {
+      const correct = +btn.dataset.k === q.a;
+      if (correct) score++;
+      ST.recordAnswer(user.id, tid, correct);          // updates Knowledge Tracing
+
+      page.querySelectorAll('.qz-opt').forEach(x => {
+        x.disabled = true;
+        if (+x.dataset.k === q.a) x.classList.add('ok');
+      });
+      if (!correct) btn.classList.add('bad');
+
+      document.getElementById('fb').innerHTML = `
+        <div class="d-flex align-items-center justify-content-between gap-3">
+          <span class="fw-bold ${correct ? 'text-success' : 'text-danger'}">
+            <i class="bi ${correct ? 'bi-check-circle-fill' : 'bi-x-circle-fill'} me-1"></i>${correct ? 'Correct!' : 'Not quite — see the correct answer above.'}
+          </span>
+          <button class="btn btn-brand" id="nx">${i + 1 < qs.length ? 'Next' : 'See results'} <i class="bi bi-arrow-right ms-1"></i></button>
+        </div>`;
+      document.getElementById('nx').onclick = () => { i++; i < qs.length ? showQuestion() : showResults(); };
+    };
+
+    const showResults = () => {
+      prog.style.width = '100%';
+      ST.recordAttempt(user.id, tid, score, qs.length, mode);
+
+      const m      = ST.dataFor(user.id).mastery[tid];
+      const status = ST.status(m);
+      const recs   = ST.recommend(user.id, 3).filter(r => r.topic === tid);
+      const color  = status === 'mastered' ? '#2e9d62' : status === 'weak' ? '#d17a4d' : '#0f766e';
+      const label  = status === 'mastered' ? 'Mastered!' : status === 'weak' ? 'Needs more practice' : 'Developing';
+
+      page.innerHTML = `
+        <div class="qz-card text-center">
+          <h4 class="fw-bold">Quiz complete</h4>
+          <div class="qz-ring" style="background:conic-gradient(${color} ${score / qs.length * 360}deg,#e3eeeb 0);position:relative">
+            <div style="position:absolute;inset:12px;background:#fff;border-radius:50%;display:grid;place-items:center">${score}/${qs.length}</div>
+          </div>
+          <p class="mb-1">Estimated mastery of <strong>${topic.name}</strong>: <strong>${pct(m)}%</strong></p>
+          <span class="strength-chip ${status === 'mastered' ? '' : 'needs-chip'}">${label}</span>
+
+          <div class="text-start mt-4">
+            ${recs.length
+              ? '<h6 class="fw-bold">Recommended next</h6>' + recs.map(r => recItem(r, user.id)).join('')
+              : '<p class="text-muted text-center">Great work — no extra resources needed for this topic.</p>'}
+          </div>
+
+          <div class="d-flex flex-wrap gap-2 justify-content-center mt-4">
+            <a class="btn btn-brand" href="dashboard.html">Go to dashboard</a>
+            <a class="btn btn-outline-brand" href="quiz.html?topic=${tid}">Retake</a>
+            <a class="btn btn-outline-brand" href="quiz.html">Another topic</a>
+          </div>
+        </div>`;
+      wireRecs(page, user.id, () => {});
+    };
+
+    showQuestion();
+  };
+
+  /* ---------- Start: topic in the URL = quiz, otherwise = picker ---------- */
+  const topicId = params.get('topic');
+  ST_QUESTIONS[topicId] ? runQuiz(topicId, params.get('mode') || 'quiz') : showPicker();
+}
+</script>
+<script src="../assets/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
